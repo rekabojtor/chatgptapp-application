@@ -1,9 +1,28 @@
-from mcp.server.fastmcp import FastMCP
+import os
+from fastmcp import FastMCP
+from fastmcp.server.auth.providers.jwt import StaticTokenVerifier
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
-mcp = FastMCP("ebaygptapp", host="0.0.0.0", port=8000)
+verifier = StaticTokenVerifier(
+    tokens={
+        os.environ["API_TOKEN"]: {
+            "client_id": "chatgpt",
+            "scopes": ["api:access"]
+        },
+    },
+    required_scopes=["api:access"]
+)
+
+mcp = FastMCP("ebaygptapp", auth=verifier)
+
+# This one is unauthenticated healthcheck endpoint for the loadbalancer
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request) -> JSONResponse:
+    return JSONResponse({"status": "ok"})
 
 @mcp.tool()
-def word_count(text: str) -> dict:
+async def word_count(text: str) -> dict:
     """Return basic counts for a block of text."""
     words = text.split()
     lines = text.splitlines()
@@ -15,5 +34,6 @@ def word_count(text: str) -> dict:
         "lines": len(lines),
     }
 
+
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    mcp.run(transport="sse", host="0.0.0.0", port=8000)
