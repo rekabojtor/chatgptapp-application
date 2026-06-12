@@ -34,6 +34,6 @@ async def word_count(text: str) -> dict:
         "lines": len(lines),
     }
 
-
+# run on a VM with "nohup uv run main.py > log.tmp 2>&1 &"
 if __name__ == "__main__":
     mcp.run(transport="http", host="127.0.0.1", port=8000)
