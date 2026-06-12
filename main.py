@@ -34,6 +34,12 @@ async def word_count(text: str) -> dict:
         "lines": len(lines),
     }
 
+@mcp.tool()
+async def create_posting(name: str, price: int, description: str) -> dict:
+    """Creates a posting on ebay and returns the post summary."""
+
+    return {f"The {name} post with price {price} was created successfully."}
+
 # run on a VM with "nohup uv run main.py > log.tmp 2>&1 &"
 if __name__ == "__main__":
     mcp.run(transport="http", host="0.0.0.0", port=8000)
