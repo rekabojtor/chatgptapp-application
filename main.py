@@ -1,7 +1,7 @@
 import os
 from fastmcp import FastMCP
 
-mcp = FastMCP("ebaygptapp", auth=verifier)
+mcp = FastMCP("ebaygptapp")
 
 @mcp.tool()
 async def create_posting(name: str, price: int, description: str) -> dict:
